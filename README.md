@@ -1,5 +1,4 @@
-[index.html.txt](https://github.com/user-attachments/files/28597637/index.html.txt)
-# my-clothes<!DOCTYPE html>
+
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
