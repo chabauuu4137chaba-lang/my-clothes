@@ -1,1 +1,292 @@
-# my-clothes
+[index.html.txt](https://github.com/user-attachments/files/28597637/index.html.txt)
+# my-clothes<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lace & Ribbon - Lolita Closet -</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts (Lora, Kosugi Maru, Playfair Display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Lora', 'Kosugi Maru', serif;
+      background-color: #fdf6f6;
+      background-image: radial-gradient(#fbcfe8 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .lolita-border {
+      border: 8px double #f472b6;
+    }
+    .lace-pattern {
+      background-image: radial-gradient(circle at 100% 150%, transparent 24%, #fbcfe8 24%, #fbcfe8 28%, transparent 28%, transparent);
+      background-size: 20px 20px;
+    }
+    /* カスタムスクロールバー */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #fdf6f6;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #f472b6;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-stone-800 flex flex-col">
+
+  <!-- ヘッダー -->
+  <header class="bg-rose-50 border-b border-pink-200 py-4 px-6 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="text-center md:text-left">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-pink-600 tracking-wider flex items-center justify-center md:justify-start gap-2" style="font-family: 'Playfair Display', serif;">
+        <span>🎀</span> Lace & Ribbon <span>🎀</span>
+      </h1>
+      <p class="text-xs text-pink-400 mt-1 italic tracking-widest">夢のロリィタ・クローゼット & コーディネートパレット</p>
+    </div>
+    <div class="flex gap-2">
+      <button id="btn-save-coord" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-all flex items-center gap-2 text-sm border-2 border-pink-300">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        コーデを保存する
+      </button>
+      <button id="btn-reset-canvas" class="bg-stone-100 hover:bg-stone-200 text-stone-600 font-semibold py-2 px-4 rounded-full shadow-sm transition-all flex items-center gap-2 text-sm border border-stone-300">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        リセット
+      </button>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- 左ペイン: 画像アップロード & 背景透過・アイテム管理 (5列) -->
+    <section class="lg:col-span-5 flex flex-col gap-6">
+      
+      <!-- アイテム追加パネル -->
+      <div class="bg-white rounded-2xl p-5 shadow-lg border border-pink-100 relative overflow-hidden">
+        <!-- レース風ヘッダー装飾 -->
+        <div class="absolute top-0 left-0 right-0 h-2 bg-pink-300"></div>
+        <h2 class="text-lg font-bold text-pink-700 flex items-center gap-2 mb-3 mt-1">
+          <i data-lucide="sparkles" class="w-5 h-5 text-pink-500"></i>
+          手持ちの画像からアイテムを作る
+        </h2>
+        
+        <p class="text-xs text-stone-500 mb-4 leading-relaxed">
+          お手持ちのお洋服やアクセサリーの写真をアップロードしてください。<br>
+          <strong class="text-pink-600">魔法のマジックワンド（透過）機能</strong>で、お洋服をタップするだけで背景を一瞬で消去できます！
+        </p>
+
+        <!-- アップロードゾーン -->
+        <div class="border-2 border-dashed border-pink-200 rounded-xl p-4 text-center hover:bg-pink-50/50 transition-colors cursor-pointer relative" id="drop-zone">
+          <input type="file" id="file-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" />
+          <div class="flex flex-col items-center gap-2">
+            <div class="bg-pink-100 p-3 rounded-full text-pink-500">
+              <i data-lucide="image-plus" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-semibold text-stone-600">画像をドラッグ＆ドロップ またはクリック</p>
+            <p class="text-xs text-stone-400">スマホで撮影したお洋服の写真もOK</p>
+          </div>
+        </div>
+
+        <!-- プレビューと透過処理設定（大画面化） -->
+        <div id="processing-panel" class="hidden mt-4 p-4 bg-pink-50/70 border border-pink-100 rounded-xl">
+          <p class="text-xs font-bold text-pink-700 mb-2 flex items-center gap-1">
+            <i data-lucide="wand-2" class="w-4 h-4"></i>
+            魔法の背景透過クローゼット (作業パレット)
+          </p>
+          
+          <div class="flex flex-col gap-3 mb-4">
+            <!-- 編集キャンバス：縦長かつ十分な高さを確保 -->
+            <div class="relative w-full aspect-[3/4] min-h-[380px] md:min-h-[440px] bg-white rounded-lg border border-pink-100">
+              <canvas id="edit-canvas" class="max-w-full max-h-full object-contain cursor-crosshair"></canvas>
+            </div>
+            <p class="text-[10px] text-pink-600 font-bold text-center bg-white py-1.5 px-2 rounded-md border border-pink-100">
+              🎯 消したい部分（背景など）を直接タッチ／クリックすると透過します
+            </p>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-stone-600 mb-1">カテゴリ分類</label>
+                <select id="item-category" class="w-full text-xs bg-white border border-pink-200 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-pink-400">
+                  <option value="onepiece">ワンピース (One Piece)</option>
+                  <option value="tops">トップス (Tops)</option>
+                  <option value="bottoms">ボトムス (Bottoms)</option>
+                  <option value="outer">アウター (Outer)</option>
+                  <option value="shoes">シューズ (Shoes)</option>
+                  <option value="accessory">アクセサリー・髪飾り</option>
+                  <option value="other">その他 (Other)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-stone-600 mb-1">アイテムの名前</label>
+                <input type="text" id="item-name" placeholder="例: いちご柄ワンピ" class="w-full text-xs bg-white border border-pink-200 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-pink-400">
+              </div>
+            </div>
+
+            <!-- しきい値スライダー -->
+            <div class="bg-white p-2.5 rounded-lg border border-pink-100">
+              <div class="flex justify-between text-xs font-bold text-stone-600 mb-1">
+                <span>色の許容範囲（しきい値）</span>
+                <span id="tolerance-val" class="text-pink-500">30</span>
+              </div>
+              <input type="range" id="transparency-tolerance" min="5" max="150" value="30" class="w-full accent-pink-500">
+              <p class="text-[9px] text-stone-400 mt-1">数値を上げると、背景に似た色をより広く消去します。</p>
+            </div>
+          </div>
+
+          <!-- 操作ボタン群 -->
+          <div class="flex flex-col gap-2">
+            <button id="btn-auto-transparent" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+              <i data-lucide="wand-2" class="w-4 h-4"></i>
+              自動で背景を消去 (角から一括)
+            </button>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button id="btn-reset-edit" class="bg-white hover:bg-stone-50 text-stone-600 border border-stone-300 text-xs py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1">
+                <i data-lucide="undo" class="w-3.5 h-3.5"></i> 戻す
+              </button>
+              <button id="btn-save-edit" class="bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold py-2 px-2 rounded-lg transition-all flex items-center justify-center gap-1 shadow-sm col-span-2">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> クローゼットへ保存
+              </button>
+            </div>
+            <button id="btn-cancel-upload" class="w-full bg-stone-200 hover:bg-stone-300 text-stone-600 text-xs py-2 rounded-lg transition-all mt-1">
+              キャンセル
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- クローゼット（アイテム一覧） -->
+      <div class="bg-white rounded-2xl p-5 shadow-lg border border-pink-100 flex-1 flex flex-col min-h-[350px]">
+        <h2 class="text-lg font-bold text-pink-700 flex items-center gap-2 mb-3">
+          <i data-lucide="pocket" class="w-5 h-5 text-pink-500"></i>
+          マイクローゼット
+        </h2>
+        
+        <!-- カテゴリ切り替えタブ -->
+        <div class="flex gap-1 overflow-x-auto pb-2 mb-3 border-b border-pink-50 scrollbar-none" id="closet-tabs">
+          <button data-cat="all" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-pink-500 text-white shadow-sm">すべて</button>
+          <button data-cat="onepiece" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-pink-100">ワンピ</button>
+          <button data-cat="tops" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-pink-100">トップス</button>
+          <button data-cat="bottoms" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-pink-100">ボトムス</button>
+          <button data-cat="outer" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-pink-100">アウター</button>
+          <button data-cat="shoes" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-pink-100">シューズ</button>
+          <button data-cat="accessory" class="closet-tab px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-pink-100">アクセ</button>
+        </div>
+
+        <!-- クローゼットアイテムリスト -->
+        <div id="closet-grid" class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-3 gap-3 overflow-y-auto max-h-[360px] pr-1 flex-1">
+          <!-- JSでアイテムを動的に挿入します -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 右ペイン: 夢のコーディネートキャンバス (7列) -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
+      
+      <!-- コーディネートワークスペース -->
+      <div class="bg-white rounded-3xl p-4 shadow-xl border-4 border-pink-200 relative flex flex-col overflow-hidden flex-1 min-h-[500px]">
+        <!-- キャンバスヘッダー -->
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-sm font-bold text-pink-700 flex items-center gap-1.5">
+            <span class="inline-block w-2.5 h-2.5 bg-pink-500 rounded-full animate-ping"></span>
+            ドーリーパレット
+          </span>
+          <!-- 背景選択 -->
+          <div class="flex items-center gap-1.5 bg-pink-50 px-2 py-1 rounded-full border border-pink-100">
+            <span class="text-xs text-pink-600 font-bold">背景：</span>
+            <button data-bg="pink-room" class="bg-btn w-5 h-5 rounded-full border border-pink-300 bg-pink-200 active" title="ドーリーピンク"></button>
+            <button data-bg="elegant-gold" class="bg-btn w-5 h-5 rounded-full border border-stone-300 bg-stone-200" title="クラシックホワイト"></button>
+            <button data-bg="sweet-mint" class="bg-btn w-5 h-5 rounded-full border border-teal-300 bg-teal-100" title="ミントショコラ"></button>
+            <button data-bg="alice-blue" class="bg-btn w-5 h-5 rounded-full border border-sky-300 bg-sky-100" title="アリスブルー"></button>
+          </div>
+        </div>
+
+        <!-- キャンバスエリア (ドラッグドロップ、操作用) -->
+        <div id="canvas-container" class="relative flex-1 rounded-2xl overflow-hidden border border-pink-100 shadow-inner min-h-[400px]" style="background-image: linear-gradient(135deg, #fdf4f5 0%, #fbcfe8 100%);">
+          <!-- 背景ガイド（トルソーやドール代わりの薄いシルエット） -->
+          <div class="absolute inset-0 flex items-center justify-center opacity-[0.08] pointer-events-none select-none">
+            <svg class="w-80 h-80" viewBox="0 0 100 100" fill="currentColor">
+              <!-- おおよその女性トルソーのアウトライン -->
+              <path d="M50,15 C45,15 42,20 42,25 C42,30 45,35 50,35 C55,35 58,30 58,25 C58,20 55,15 50,15 Z M50,36 C42,36 38,40 36,48 C34,55 35,65 38,75 C40,80 43,85 50,85 C57,85 60,80 62,75 C65,65 66,55 64,48 C62,40 58,36 50,36 Z"/>
+            </svg>
+          </div>
+          <!-- アクティブなアイテムがここに動的に生成されます -->
+        </div>
+
+        <!-- コントロールバー (選択されたアイテムがある場合表示) -->
+        <div id="canvas-controls" class="mt-4 p-3 bg-rose-50 border border-pink-200 rounded-xl flex flex-wrap items-center justify-between gap-4 invisible">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-pink-700 bg-white px-2 py-1 rounded border border-pink-200">選択中: <span id="selected-item-name">なし</span></span>
+          </div>
+          <!-- 微調整スライダーや操作ボタン -->
+          <div class="flex items-center flex-wrap gap-3 text-xs">
+            <!-- 拡大縮小 -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-stone-500">サイズ:</span>
+              <input type="range" id="control-scale" min="0.2" max="2" step="0.05" value="1" class="w-20 accent-pink-500">
+            </div>
+            <!-- 回転 -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-stone-500">回転:</span>
+              <input type="range" id="control-rotate" min="-180" max="180" step="1" value="0" class="w-20 accent-pink-500">
+            </div>
+            <!-- レイヤー重なり順 -->
+            <div class="flex gap-1">
+              <button id="btn-layer-up" class="p-1 bg-white hover:bg-stone-100 rounded border border-stone-200 shadow-sm" title="前面へ移動">
+                <i data-lucide="chevron-up" class="w-4 h-4 text-stone-600"></i>
+              </button>
+              <button id="btn-layer-down" class="p-1 bg-white hover:bg-stone-100 rounded border border-stone-200 shadow-sm" title="背面へ移動">
+                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-600"></i>
+              </button>
+              <button id="btn-flip" class="p-1 bg-white hover:bg-stone-100 rounded border border-stone-200 shadow-sm" title="左右反転">
+                <i data-lucide="flip-horizontal" class="w-4 h-4 text-stone-600"></i>
+              </button>
+              <button id="btn-delete-element" class="p-1 bg-red-50 hover:bg-red-100 rounded border border-red-200 shadow-sm" title="削除">
+                <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作説明ガイド -->
+        <p class="text-[10px] text-stone-400 text-center mt-2">
+          🪄 クローゼットのアイテムをタッチでキャンバスに追加できます。アイテムはドラッグ（PC）やスワイプ（スマホ）で自由に移せ、ピンチズームで拡大縮小できます。
+        </p>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- フッター -->
+  <footer class="bg-rose-50 border-t border-pink-100 py-4 px-6 text-center text-xs text-pink-400">
+    <p>🎀 Designed with Love - Dress up your Lolita Fantasy 🎀</p>
+  </footer>
+
+  <!-- カスタムダイアログ（alert代わりに使う通知モーダル） -->
+  <div id="custom-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-pink-200 text-center">
+      <div id="modal-icon" class="w-12 h-12 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="info" class="w-6 h-6"></i>
+      </div>
+      <h3 id="modal-title" class="text-lg font-bold text-stone-800 mb-2">通知</h3>
+      <p id="modal-message" class="text-sm text-stone-600 mb-4"></p>
+      <button id="modal-close" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-full text-sm transition-all shadow-md">
+        閉じる
+      </button>
+    </div>
+  </div>
+
+  <!-- HTML2Canvas ライブラリ (コーデ保存用) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- アプリメインスクリプト -->
+  <script src="app.js"></script>
+</body>
+</html>
